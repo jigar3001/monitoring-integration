@@ -1,0 +1,18 @@
+dashboards:
+  - gluster-at-a-glance
+  - gluster-hosts
+  - gluster-volumes
+  - gluster-bricks
+
+home_dashboard: tendrl-gluster-at-a-glance
+
+datasource:
+  - graphite
+
+credentials:
+  user: admin
+  password: admin
+
+port: 3000
+
+host: localhost
