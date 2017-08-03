@@ -70,7 +70,7 @@ Prerequisites
 Usage Details
 --------------
 
-.. note::
+**Note::**
 
   Configuration file monitoring-integration.conf.yaml needed by monitoring-integration
   is present under
@@ -83,12 +83,12 @@ Usage Details
 
         $ cp etc/tendrl/monitoring-integration/monitoring-integration.conf.yaml.sample
           /etc/tendrl/monitoring-integration/monitoring-integration.conf.yaml
+	  
+  Default dashboards that are to be created in grafana are present under
 
-   Default dashboards that are to be created in grafana are present under
+  ' /etc/tendrl/monitoring-integration/grafana/dashboards/ '
 
-   ' /etc/tendrl/monitoring-integration/grafana/dashboards/ '
-
-   If the dashboards are not present.
+  If the dashboards are not present.
 
     ::
 
@@ -98,7 +98,7 @@ Usage Details
           /etc/tendrl/monitoring-integration/grafana/dashboards/.
 
 
-* Development setup
+* **Development setup**
 
   * Create a json file in /etc/tendrl/monitoring-integration/grafana/dashboards/ and provide json
     for the dashboard that is to be created.
@@ -126,4 +126,3 @@ Usage Details
 
         $ cd tendrl/monitoring_integration/
         $ python __init__.py	
-
