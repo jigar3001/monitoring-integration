@@ -1,22 +1,5 @@
-
-
 Monitoring-Integration
 =======================
-
-
-Functionalities
-----------------
-
-- Create new dashboard in Grafana
-
-
-Prerequisites
------------------
-
-#. Install Grafana. 
-   Follow the steps provided in below mentioned doc to install grafana.
-
-    http://docs.grafana.org/installation/rpm/
 
 Usage Details
 --------------
@@ -25,53 +8,84 @@ Usage Details
 
   All the commands mentioned below are run as a regular user that has ``sudo``
   privileges.
-      
-  Configuration file monitoring-integration.conf.yaml needed by monitoring-integration
-  is present under
- 
-  ' /etc/tendrl/monitoring-integration/'
 
-  Default dashboards that are to be created in grafana are present under
+Step 1. **Conifgure Graphite**
 
-  ' /etc/tendrl/monitoring-integration/grafana/dashboards/ '
+        ::
+
+            $ /usr/lib/python2.7/site-packages/graphite/manage.py syncdb 
+              --noinput chown apache:apache /var/lib/graphite-web/graphite.db
 
 
+Step 2. **Installing Monitoring-Integration**
 
-* **Restart server to load new configurations**
-
-  * Start grafana server
-  
-    ::
-
-        $ service grafana-server start  
-  
-  * Restart httpd
-
-    ::
-
-        $ service httpd restart  
-
-* **Installing Monitoring-Integration**
-
-    ::
+        **Note**
     
-        $ yum install tendrl-monitoring-integration
+          Make sure tendrl repositories are enabled.
+          https://github.com/Tendrl/documentation/wiki/Tendrl-Package-Installation-Reference
+
+          ::
+    
+              $ yum install tendrl-monitoring-integration
+
+
+3. **Start/Restart server to load new configurations**
+
+* Enable and start carbon-cache service
+
+  ::
+
+      $ systemctl enable carbon-cache
+      $ systemctl start carbon-cache
+
+
+* Start grafana server
+  
+  ::
+
+      $ systemctl daemon-reload
+      $ systemctl enable grafana-server.service
+      $ systemctl start grafana-server
+
+  
+* Restart httpd
+
+  ::
+
+      $ systemctl restart httpd
 	
-   **Note**
-        Make sure tendrl repositories are enabled.
-	https://github.com/Tendrl/documentation/wiki/Tendrl-Package-Installation-Reference
+4. **Configuring Monitoring-Integration**
 
-* **Running Monitoring-Integration**
+* Open monitoring-integration.conf.yaml:
 
-  * Provide host ip-address of datasource to be created in grafana under "datasource_host" in
-    monitoring-integration.conf.yaml file
+  ::
+   
+      $ vi /etc/tendrl/monitoring-integration/monitoring-integration.conf.yaml 
+
+* Update datasource_host with IP of graphite server:
+
+  ::
+  
+      datasource_host = <IP of graphite server>
+
+  **Note** :
     
-    **Note**
-        Please provide the ip of server node where graphite is installed. Do not provide
-	localost or 127.0.0.1 even if the graphite is installed on the local server.
+      Do not provide localost or 127.0.0.1.
 
-  * Run monitoring-integration
 
-    ::
+5. **Running Monitoring-Integration**
 
-        $ tendrl-monitoring-integration
+* Run monitoring-integration
+
+  ::
+
+      $ tendrl-monitoring-integration
+
+
+6. **Open Grafana**
+
+* Open the following URL in the browser
+
+  ::
+
+     http://<IP of the server>:3000
