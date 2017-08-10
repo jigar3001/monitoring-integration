@@ -41,6 +41,7 @@ install -m  0755  --directory $RPM_BUILD_ROOT%{_var}/log/tendrl/monitoring-integ
 install -m  0755  --directory $RPM_BUILD_ROOT%{_sysconfdir}/tendrl/monitoring-integration
 install -m  0755  --directory $RPM_BUILD_ROOT%{_sysconfdir}/tendrl/monitoring-integration/grafana
 install -m  0755  --directory $RPM_BUILD_ROOT%{_sysconfdir}/tendrl/monitoring-integration/grafana/dashboards
+install -Dm 0644 tendrl-monitoring-integration.service $RPM_BUILD_ROOT%{_unitdir}/tendrl-monitoring-integration.service
 #install -Dm 0644 monitoring-integration.service $RPM_BUILD_ROOT%{_unitdir}/monitoring-integration.service
 install -Dm 0644 etc/grafana/grafana.ini $RPM_BUILD_ROOT%{_sysconfdir}/grafana/grafana.ini
 install -Dm 0644 etc/tendrl/monitoring-integration/monitoring-integration.conf.yaml.sample $RPM_BUILD_ROOT%{_sysconfdir}/tendrl/monitoring-integration/monitoring-integration.conf.yaml
@@ -89,3 +90,4 @@ py.test -v tendrl/monitoring_integration/tests || :
 %changelog
 * Wed Aug 02 2017 Timothy Asir Jeyasingh <tjeyasin@redhat.com> - 0.0.1-1
 - Initial build.
+
