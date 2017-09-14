@@ -65,20 +65,25 @@ class GraphitePlugin():
         partial = 0
         for key, value in obj_attr["count"].items():
             for resource_detail in resource_details["details"]:
-                if key == "total":
-                   total = total + 1
-                if key == "up":
-                   for attr_key, attr_values in obj_attr["count"]["up"].items():
-                       if resource_detail[attr_key] in attr_values:
-                           up = up + 1
-                if key == "down":
-                   for attr_key, attr_values in obj_attr["count"]["down"].items():
-                       if resource_detail[attr_key] in attr_values:
-                           down = down + 1
-                if key == "partial":
-                   for attr_key, attr_values in obj_attr["count"]["partial"].items():
-                       if resource_detail[attr_key] in attr_values:
-                           partial = partial + 1
+		try:
+                    if key == "total":
+                        total = total + 1
+                    if key == "up":
+                        for attr_key, attr_values in obj_attr["count"]["up"].items():
+                            if resource_detail[attr_key] in attr_values:
+                                up = up + 1
+                    if key == "down":
+                        for attr_key, attr_values in obj_attr["count"]["down"].items():
+                            if resource_detail[attr_key] in attr_values:
+                                down = down + 1
+                    if key == "partial":
+                        for attr_key, attr_values in obj_attr["count"]["partial"].items():
+                            if resource_detail[attr_key] in attr_values:
+                                partial = partial + 1
+	        except (KeyError, etcd.EtcdKeyNotFound) as ex:
+                    logger.log("error", NS.get("publisher_id", None),
+                               {'message': "Error while getting resource count " +
+                                str(resource_detail).split('/')[0] + " " + str(ex)})
         resource_details["total"] = total
         resource_details["up"] = up
         resource_details["down"] = down
@@ -89,16 +94,21 @@ class GraphitePlugin():
         attr_details = etcd_utils.read(resource_key)
         resource_details = {"details" : []}
         for attr_detail in attr_details.leaves:
-             resource_detail = {}
-             attr_key = attr_detail.key.rsplit("/", 1)[1]
-             for key, value in obj_attr["attrs"].items():
-                 sub_attr = etcd_utils.read(os.path.join(resource_key, attr_key, key))
-                 resource_detail[key] = sub_attr.value
-             resource_details["details"].append(resource_detail)
+            try:
+                resource_detail = {}
+                attr_key = attr_detail.key.rsplit("/", 1)[1]
+                for key, value in obj_attr["attrs"].items():
+                    sub_attr = etcd_utils.read(os.path.join(resource_key, attr_key, key))
+                    resource_detail[key] = sub_attr.value
+                resource_details["details"].append(resource_detail)
+            except (KeyError, etcd.EtcdKeyNotFound) as ex:
+                    logger.log("error", NS.get("publisher_id", None),
+                               {'message': "Error while getting resource " +
+                                str(attr_detail).split('/')[0] + " " + str(ex)})
         try:
             if obj_attr["count"]:
                 resource_details = self.get_resource_count(resource_details, obj_attr)
-        except KeyError:
+        except (KeyError, etcd.EtcdKeyNotFound) as ex:
             pass
         return resource_details
 
@@ -216,7 +226,7 @@ class GraphitePlugin():
                 logger.log("error", NS.get("publisher_id", None),
                            {'message': "Failed to set resource details" + str(ex)})
             return cluster_data
-        except (etcd.EtcdKeyNotFound, AttributeError, KeyError) as ex:
+        except (etcd.EtcdException, etcd.EtcdKeyNotFound, AttributeError, KeyError) as ex:
             logger.log("error", NS.get("publisher_id", None),
                        {'message': str(ex)})
             raise ex
